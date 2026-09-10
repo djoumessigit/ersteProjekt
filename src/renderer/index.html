@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>MA'A-Bri</title>
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img class="sidebar-logo" src="assets/logo.svg" alt="Logo MA'A-Bri" />
+        <div class="sidebar-wordmark">
+          <span class="sidebar-title">MA'A-Bri</span>
+          <span class="sidebar-subtitle">Gestion de stock</span>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-page="stock">📦 Stock</button>
+        <button class="nav-btn" data-page="entree">➕ Entree</button>
+        <button class="nav-btn" data-page="sortie">➖ Sortie</button>
+        <button class="nav-btn" data-page="rapport">📊 Rapport</button>
+      </nav>
+    </aside>
+
+    <main class="main-area">
+      <header class="main-header">
+        <div class="main-header-inner">
+          <h1 id="page-title">Vue Stock</h1>
+        </div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <!-- Services renderer (gestion des requetes vers le main-process) -->
+  <script src="js/services/ApiClient.js"></script>
+
+  <!-- Composants graphiques -->
+  <script src="js/components/StockTable.js"></script>
+  <script src="js/components/FormAjout.js"></script>
+  <script src="js/components/FormSortie.js"></script>
+  <script src="js/components/RapportView.js"></script>
+
+  <!-- Orchestrateur -->
+  <script src="js/app.js"></script>
+</body>
+</html>
