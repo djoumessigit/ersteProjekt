@@ -33,6 +33,10 @@ class App {
         this.pageTitle.textContent = "Vue Stock";
         await this._afficherStock();
         break;
+      case "epice":
+        this.pageTitle.textContent = "Nouvelle epice";
+        await this._afficherFormEpice();
+        break;
       case "entree":
         this.pageTitle.textContent = "Entree de stock";
         await this._afficherFormEntree();
@@ -44,6 +48,10 @@ class App {
       case "rapport":
         this.pageTitle.textContent = "Rapport des mouvements";
         await this._afficherRapport();
+        break;
+      case "parametres":
+        this.pageTitle.textContent = "Parametres";
+        await this._afficherParametres();
         break;
     }
   }
@@ -61,15 +69,28 @@ class App {
     }
   }
 
+  async _afficherFormEpice() {
+    this.content.innerHTML = `<div id="form-epice-container"></div>`;
+    const container = document.getElementById("form-epice-container");
+    const form = new FormEpice(container, this.apiClient, () => {});
+    await form.render();
+  }
+
   async _afficherFormEntree() {
-    this.content.innerHTML = `<div id="form-entree-container"></div>`;
+    this.content.innerHTML = `
+      <div class="form-page-centree">
+        <div id="form-entree-container"></div>
+      </div>`;
     const container = document.getElementById("form-entree-container");
     const form = new FormAjout(container, this.apiClient, () => {});
     await form.render();
   }
 
   async _afficherFormSortie() {
-    this.content.innerHTML = `<div id="form-sortie-container"></div>`;
+    this.content.innerHTML = `
+      <div class="form-page-centree">
+        <div id="form-sortie-container"></div>
+      </div>`;
     const container = document.getElementById("form-sortie-container");
     const form = new FormSortie(container, this.apiClient, () => {});
     await form.render();
@@ -81,9 +102,24 @@ class App {
     const rapport = new RapportView(container, this.apiClient);
     await rapport.render();
   }
+
+  async _afficherParametres() {
+    this.content.innerHTML = `<div id="parametres-container"></div>`;
+    const container = document.getElementById("parametres-container");
+    const vue = new SettingsView(container, this.apiClient);
+    await vue.render();
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const app = new App();
-  app.init();
+  const apiClient = new ApiClient();
+  const authScreen = document.getElementById("auth-screen");
+  const appShell = document.getElementById("app-shell");
+
+  const authGate = new AuthGate(apiClient, authScreen, appShell, () => {
+    const app = new App();
+    app.init();
+  });
+
+  authGate.demarrer();
 });

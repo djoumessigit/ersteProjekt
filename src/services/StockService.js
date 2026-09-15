@@ -20,7 +20,16 @@ class StockService {
     if (!unite || !unite.trim()) {
       throw new Error("L'unite est obligatoire.");
     }
-    const epice = new Epice(null, nom.trim(), unite.trim());
+
+    const nomNormalise = nom.trim();
+    const existeDeja = this.repository
+      .getAllEpices()
+      .some((e) => e.nom.toLowerCase() === nomNormalise.toLowerCase());
+    if (existeDeja) {
+      throw new Error(`Une epice nommee "${nomNormalise}" existe deja.`);
+    }
+
+    const epice = new Epice(null, nomNormalise, unite.trim());
     return this.repository.saveEpice(epice);
   }
 

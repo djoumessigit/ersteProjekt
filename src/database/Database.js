@@ -37,6 +37,11 @@ class Database {
         date      TEXT NOT NULL,
         FOREIGN KEY (epice_id) REFERENCES Epice(id) ON DELETE CASCADE
       );
+
+      CREATE TABLE IF NOT EXISTS Config (
+        cle    TEXT PRIMARY KEY,
+        valeur TEXT NOT NULL
+      );
     `);
   }
 

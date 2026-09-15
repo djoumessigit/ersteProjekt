@@ -109,6 +109,24 @@ class SQLiteRepository {
       stock: r.stock,
     }));
   }
+
+  // ---------- CONFIG (cle/valeur, ex : mot de passe hache) ----------
+
+  getConfig(cle) {
+    const row = this.db
+      .prepare("SELECT valeur FROM Config WHERE cle = ?")
+      .get(cle);
+    return row ? row.valeur : null;
+  }
+
+  setConfig(cle, valeur) {
+    this.db
+      .prepare(
+        `INSERT INTO Config (cle, valeur) VALUES (?, ?)
+         ON CONFLICT(cle) DO UPDATE SET valeur = excluded.valeur`
+      )
+      .run(cle, valeur);
+  }
 }
 
 module.exports = SQLiteRepository;

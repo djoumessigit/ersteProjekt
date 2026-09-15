@@ -7,13 +7,37 @@ const { ipcMain } = require("electron");
  * C'est le SEUL endroit ou le main-process "ecoute" le renderer.
  */
 class IpcHandlers {
-  constructor(stockService, rapportService) {
+  constructor(stockService, rapportService, authService) {
     this.stockService = stockService;
     this.rapportService = rapportService;
+    this.authService = authService;
   }
 
   /** Enregistre tous les canaux IPC. A appeler une fois au demarrage. */
   register() {
+    // ---- AUTHENTIFICATION ----
+    ipcMain.handle("auth:estConfigure", () => {
+      return this._safe(() => this.authService.estMotDePasseDefini());
+    });
+
+    ipcMain.handle("auth:definir", (event, { motDePasse }) => {
+      return this._safe(() => {
+        this.authService.definirMotDePasse(motDePasse);
+        return true;
+      });
+    });
+
+    ipcMain.handle("auth:verifier", (event, { motDePasse }) => {
+      return this._safe(() => this.authService.verifierMotDePasse(motDePasse));
+    });
+
+    ipcMain.handle("auth:changer", (event, { ancienMotDePasse, nouveauMotDePasse }) => {
+      return this._safe(() => {
+        this.authService.changerMotDePasse(ancienMotDePasse, nouveauMotDePasse);
+        return true;
+      });
+    });
+
     // ---- EPICE ----
     ipcMain.handle("epice:lister", () => {
       return this._safe(() => this.stockService.listerEpices().map((e) => e.toJSON()));

@@ -5,6 +5,43 @@
  * ils passent toujours par cette classe.
  */
 class ApiClient {
+  async authEstConfigure() {
+    return this._unwrap(await window.api.auth.estConfigure());
+  }
+
+  async authDefinir(motDePasse) {
+    return this._unwrap(await window.api.auth.definir(motDePasse));
+  }
+
+  async authVerifier(motDePasse) {
+    return this._unwrap(await window.api.auth.verifier(motDePasse));
+  }
+
+  async authChanger(ancienMotDePasse, nouveauMotDePasse) {
+    return this._unwrap(await window.api.auth.changer(ancienMotDePasse, nouveauMotDePasse));
+  }
+
+  async obtenirVersion() {
+    return this._unwrap(await window.api.app.version());
+  }
+
+  async verifierMiseAJour() {
+    return this._unwrap(await window.api.update.verifier());
+  }
+
+  async telechargerMiseAJour() {
+    return this._unwrap(await window.api.update.telecharger());
+  }
+
+  async installerMiseAJour() {
+    return this._unwrap(await window.api.update.installer());
+  }
+
+  /** S'abonne aux evenements de progression de la mise a jour. */
+  onStatutMiseAJour(callback) {
+    window.api.update.onStatut(callback);
+  }
+
   async listerEpices() {
     return this._unwrap(await window.api.epice.lister());
   }
