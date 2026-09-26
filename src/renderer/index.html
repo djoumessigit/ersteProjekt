@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src 'self' blob: data:; child-src 'self' blob: data:;" />
   <title>MA'A-Bri</title>
   <link rel="icon" href="assets/logo.svg" />
   <link rel="stylesheet" href="css/style.css" />
@@ -42,6 +42,9 @@
 
   <!-- Services renderer (gestion des requetes vers le main-process) -->
   <script src="js/services/ApiClient.js"></script>
+
+  <!-- Utilitaires -->
+  <script src="js/utils/EmailHtml.js"></script>
 
   <!-- Authentification -->
   <script src="js/components/AuthGate.js"></script>

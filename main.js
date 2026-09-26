@@ -9,8 +9,6 @@ const StockService = require("./src/services/StockService");
 const RapportService = require("./src/services/RapportService");
 const AuthService = require("./src/services/AuthService");
 const IpcHandlers = require("./src/ipc/IpcHandlers");
-const UpdateManager = require("./src/update/UpdateManager");
-const UpdateIpcHandlers = require("./src/ipc/UpdateIpcHandlers");
 
 /**
  * Classe AppMain
@@ -52,25 +50,26 @@ class AppMain {
 
     // 4. Fenetre
     this._creerFenetre();
-
-    // 5. Mise a jour (necessite la fenetre pour informer le renderer)
-    this.updateManager = new UpdateManager(this.mainWindow);
-    const updateIpcHandlers = new UpdateIpcHandlers(this.updateManager);
-    updateIpcHandlers.register();
   }
 
   _creerFenetre() {
-    this.mainWindow = new BrowserWindow({
+    const options = {
       width: 1100,
       height: 720,
       title: "MA'A-Bri",
-      icon: this._cheminIcone(),
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
         contextIsolation: true,
         nodeIntegration: false,
       },
-    });
+    };
+
+    const icone = this._cheminIcone();
+    if (icone) {
+      options.icon = icone;
+    }
+
+    this.mainWindow = new BrowserWindow(options);
 
     this.mainWindow.loadFile(
       path.join(__dirname, "src", "renderer", "index.html")
@@ -78,30 +77,34 @@ class AppMain {
   }
 
   /**
-   * Renvoie le chemin de l'icone adaptee a la plateforme :
-   * - Windows : .ico (barre des taches + executable)
-   * - macOS / Linux : .png (Dock / barre des taches)
-   * Verifie que le fichier existe reellement ; sinon, se replie sur
-   * logo.svg et avertit dans la console (evite un echec silencieux si
-   * icon.ico / icon.png n'ont pas encore ete places dans assets/).
+   * Renvoie le chemin de l'icone adaptee a la plateforme, sans message
+   * d'avertissement si un format est absent.
+   * Ordre de priorite :
+   * - Windows : icon.ico, puis icon.png, puis logo.svg
+   * - macOS / Linux : icon.png, puis logo.svg
+   * Renvoie null si aucun fichier n'existe (Electron utilisera alors
+   * l'icone par defaut, sans erreur console).
    */
   _cheminIcone() {
     const dossierAssets = path.join(__dirname, "src", "renderer", "assets");
-    const nomFichier = process.platform === "win32" ? "icon.ico" : "icon.png";
-    const cheminIcone = path.join(dossierAssets, nomFichier);
+    const candidats =
+      process.platform === "win32"
+        ? ["icon.ico", "icon.png", "logo.svg"]
+        : ["icon.png", "logo.svg"];
 
-    if (fs.existsSync(cheminIcone)) {
-      return cheminIcone;
+    for (const nom of candidats) {
+      const chemin = path.join(dossierAssets, nom);
+      if (fs.existsSync(chemin)) {
+        return chemin;
+      }
     }
-
-    console.warn(
-      `[icone] "${nomFichier}" introuvable dans ${dossierAssets} - repli sur logo.svg.`
-    );
-    return path.join(dossierAssets, "logo.svg");
+    return null;
   }
 
   quit() {
-    this.database.close();
+    if (this.database) {
+      this.database.close();
+    }
   }
 }
 

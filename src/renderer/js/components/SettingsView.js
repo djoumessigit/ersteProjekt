@@ -1,8 +1,9 @@
 /**
  * Classe SettingsView (element graphique)
- * Vue "Parametres" composee de deux blocs independants :
+ * Vue "Parametres" composee de :
  *  - Changer le mot de passe (ancien + nouveau + confirmation)
- *  - Version de l'application + verification/telechargement des mises a jour
+ *  - Seuil d'alerte stock bas
+ *  - Version de l'application (affichage uniquement)
  */
 class SettingsView {
   constructor(container, apiClient) {
@@ -16,6 +17,13 @@ class SettingsView {
       version = await this.apiClient.obtenirVersion();
     } catch (err) {
       version = "inconnue";
+    }
+
+    let seuil = 5;
+    try {
+      seuil = await this.apiClient.getSeuilStockBas();
+    } catch (err) {
+      seuil = 5;
     }
 
     this.container.innerHTML = `
@@ -32,17 +40,30 @@ class SettingsView {
         </section>
 
         <section class="form-card">
+          <h3>⚠️ Seuil d'alerte stock bas</h3>
+          <p class="param-desc">
+            Les epices dont le stock est strictement inferieur a ce seuil
+            declenchent une alerte et peuvent generer un e-mail HTML.
+          </p>
+          <form id="form-seuil">
+            <div class="field">
+              <label for="seuil-input">Seuil (quantite)</label>
+              <input type="number" id="seuil-input" name="seuil" min="0" step="1" value="${seuil}" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Enregistrer le seuil</button>
+            <p class="form-message" id="msg-seuil"></p>
+          </form>
+        </section>
+
+        <section class="form-card">
           <h3>ℹ️ Version de l'application</h3>
           <p class="version-actuelle">Version installee : <strong>${version}</strong></p>
-          <button id="btn-verifier-maj" class="btn btn-primary">Verifier les mises a jour</button>
-          <p class="form-message" id="msg-maj"></p>
-          <div id="maj-actions" class="maj-actions hidden"></div>
         </section>
       </div>
     `;
 
     this._attacherFormMotDePasse();
-    this._attacherMiseAJour();
+    this._attacherFormSeuil();
   }
 
   _champMotDePasse(name, label) {
@@ -116,81 +137,27 @@ class SettingsView {
     });
   }
 
-  // ---------- Bloc : version + mise a jour ----------
+  // ---------- Bloc : seuil d'alerte ----------
 
-  _attacherMiseAJour() {
-    const bouton = this.container.querySelector("#btn-verifier-maj");
-    const msg = this.container.querySelector("#msg-maj");
-    const actions = this.container.querySelector("#maj-actions");
+  _attacherFormSeuil() {
+    const form = this.container.querySelector("#form-seuil");
+    const msg = this.container.querySelector("#msg-seuil");
 
-    // Ecoute les evenements envoyes par UpdateManager (main-process).
-    this.apiClient.onStatutMiseAJour(({ statut, donnees }) => {
-      switch (statut) {
-        case "verification":
-          msg.textContent = "Recherche de mises a jour...";
-          msg.className = "form-message";
-          actions.classList.add("hidden");
-          actions.innerHTML = "";
-          break;
-
-        case "disponible":
-          msg.textContent = `Une nouvelle version (${donnees.version}) est disponible.`;
-          msg.className = "form-message success";
-          actions.innerHTML = `<button id="btn-telecharger-maj" class="btn btn-primary">Telecharger la mise a jour</button>`;
-          actions.classList.remove("hidden");
-          actions.querySelector("#btn-telecharger-maj").addEventListener("click", async () => {
-            msg.textContent = "Telechargement en cours...";
-            actions.innerHTML = "";
-            try {
-              await this.apiClient.telechargerMiseAJour();
-            } catch (err) {
-              msg.textContent = err.message;
-              msg.className = "form-message error";
-            }
-          });
-          break;
-
-        case "a-jour":
-          msg.textContent = "L'application est deja a jour.";
-          msg.className = "form-message success";
-          actions.classList.add("hidden");
-          actions.innerHTML = "";
-          break;
-
-        case "progression":
-          msg.textContent = `Telechargement en cours : ${Math.round(donnees.percent)}%`;
-          msg.className = "form-message";
-          break;
-
-        case "telechargee":
-          msg.textContent = "Mise a jour telechargee. Redemarre l'application pour l'installer.";
-          msg.className = "form-message success";
-          actions.innerHTML = `<button id="btn-installer-maj" class="btn btn-secondary">Redemarrer et installer</button>`;
-          actions.classList.remove("hidden");
-          actions.querySelector("#btn-installer-maj").addEventListener("click", () => {
-            this.apiClient.installerMiseAJour();
-          });
-          break;
-
-        case "erreur":
-          msg.textContent = `Erreur : ${donnees.message}`;
-          msg.className = "form-message error";
-          actions.classList.add("hidden");
-          break;
-      }
-    });
-
-    bouton.addEventListener("click", async () => {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
       msg.textContent = "";
       msg.className = "form-message";
-      actions.classList.add("hidden");
-      actions.innerHTML = "";
+
+      const seuil = Number(form.querySelector("#seuil-input").value);
       try {
-        await this.apiClient.verifierMiseAJour();
+        await this.apiClient.setSeuilStockBas(seuil);
+        msg.textContent = "Seuil enregistre.";
+        msg.classList.add("success");
       } catch (err) {
         msg.textContent = err.message;
-        msg.className = "form-message error";
+        msg.classList.add("error");
       }
     });
   }
+
 }

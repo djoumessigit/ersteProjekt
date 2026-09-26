@@ -25,23 +25,6 @@ class ApiClient {
     return this._unwrap(await window.api.app.version());
   }
 
-  async verifierMiseAJour() {
-    return this._unwrap(await window.api.update.verifier());
-  }
-
-  async telechargerMiseAJour() {
-    return this._unwrap(await window.api.update.telecharger());
-  }
-
-  async installerMiseAJour() {
-    return this._unwrap(await window.api.update.installer());
-  }
-
-  /** S'abonne aux evenements de progression de la mise a jour. */
-  onStatutMiseAJour(callback) {
-    window.api.update.onStatut(callback);
-  }
-
   async listerEpices() {
     return this._unwrap(await window.api.epice.lister());
   }
@@ -64,6 +47,18 @@ class ApiClient {
 
   async genererRapport(filtres) {
     return this._unwrap(await window.api.rapport.generer(filtres));
+  }
+
+  async getSeuilStockBas() {
+    return this._unwrap(await window.api.stock.getSeuil());
+  }
+
+  async setSeuilStockBas(seuil) {
+    return this._unwrap(await window.api.stock.setSeuil({ seuil }));
+  }
+
+  async listerEpicesSousSeuil() {
+    return this._unwrap(await window.api.stock.sousSeuil());
   }
 
   /** Deballe la reponse uniforme { success, data } / { success, error }. */

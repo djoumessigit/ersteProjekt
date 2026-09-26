@@ -97,6 +97,40 @@ class StockService {
   getStockComplet() {
     return this.repository.getStock();
   }
+
+  // ---------- SEUIL D'ALERTE STOCK BAS ----------
+
+  static CLE_SEUIL = "seuil_stock_bas";
+  static SEUIL_PAR_DEFAUT = 5;
+
+  /** Renvoie le seuil d'alerte (nombre). */
+  getSeuilStockBas() {
+    const brut = this.repository.getConfig(StockService.CLE_SEUIL);
+    if (brut === null || brut === undefined || brut === "") {
+      return StockService.SEUIL_PAR_DEFAUT;
+    }
+    const n = Number(brut);
+    return Number.isFinite(n) && n >= 0 ? n : StockService.SEUIL_PAR_DEFAUT;
+  }
+
+  /** Enregistre le seuil d'alerte. */
+  setSeuilStockBas(seuil) {
+    const n = Number(seuil);
+    if (!Number.isFinite(n) || n < 0) {
+      throw new Error("Le seuil doit etre un nombre superieur ou egal a 0.");
+    }
+    this.repository.setConfig(StockService.CLE_SEUIL, String(n));
+    return n;
+  }
+
+  /**
+   * Liste les epices dont le stock est strictement inferieur au seuil.
+   * @returns {Array<{id, nom, unite, stock}>}
+   */
+  getEpicesSousSeuil(seuil) {
+    const limite = seuil != null ? Number(seuil) : this.getSeuilStockBas();
+    return this.repository.getStock().filter((item) => item.stock < limite);
+  }
 }
 
 module.exports = StockService;

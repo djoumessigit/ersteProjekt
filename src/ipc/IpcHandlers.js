@@ -1,4 +1,4 @@
-const { ipcMain } = require("electron");
+const { ipcMain, app } = require("electron");
 
 /**
  * Classe IpcHandlers
@@ -15,6 +15,11 @@ class IpcHandlers {
 
   /** Enregistre tous les canaux IPC. A appeler une fois au demarrage. */
   register() {
+    // ---- APP ----
+    ipcMain.handle("app:version", () => {
+      return this._safe(() => app.getVersion());
+    });
+
     // ---- AUTHENTIFICATION ----
     ipcMain.handle("auth:estConfigure", () => {
       return this._safe(() => this.authService.estMotDePasseDefini());
@@ -68,6 +73,19 @@ class IpcHandlers {
     // ---- RAPPORT ----
     ipcMain.handle("rapport:generer", (event, filtres) => {
       return this._safe(() => this.rapportService.genererRapport(filtres || {}));
+    });
+
+    // ---- SEUIL D'ALERTE STOCK BAS ----
+    ipcMain.handle("stock:getSeuil", () => {
+      return this._safe(() => this.stockService.getSeuilStockBas());
+    });
+
+    ipcMain.handle("stock:setSeuil", (event, { seuil }) => {
+      return this._safe(() => this.stockService.setSeuilStockBas(seuil));
+    });
+
+    ipcMain.handle("stock:sousSeuil", () => {
+      return this._safe(() => this.stockService.getEpicesSousSeuil());
     });
   }
 

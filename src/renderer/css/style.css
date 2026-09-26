@@ -462,10 +462,143 @@ label {
   color: var(--texte);
 }
 
-.maj-actions {
-  margin-top: 12px;
+/* ---------- ALERTE STOCK BAS ---------- */
+.stock-alerte-barre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: #fff5f0;
+  border: 1px solid #f0c9b8;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--cannelle);
+  font-size: 0.95rem;
 }
 
-.maj-actions .btn {
+.stock-alerte-barre.stock-alerte-ok {
+  background: #f0f7ed;
+  border-color: #c5d9bc;
+  color: var(--basilic);
+}
+
+.stock-table tr.row-alerte td {
+  background: #fff8f0;
+  color: var(--cannelle);
+}
+
+.badge-alerte {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f5d0b5;
+  color: #8a3b12;
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* ---------- RAPPORT : barre filtres + bouton e-mail ---------- */
+.rapport-filtres {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.rapport-filtres select {
+  width: auto;
+  min-width: 200px;
+}
+
+/* ---------- PARAMETRES : description seuil ---------- */
+.param-desc {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  color: #8a7663;
+  line-height: 1.45;
+}
+
+/* ---------- PANNEAU E-MAIL HTML ---------- */
+.email-panneau-wrapper {
+  margin-top: 20px;
   width: 100%;
+}
+
+.email-panneau {
+  background: var(--carte);
+  border-radius: 10px;
+  box-shadow: var(--ombre);
+  border: 1px solid var(--gris-clair);
+  overflow: hidden;
+}
+
+.email-panneau-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--gris-clair);
+  background: #faf6f0;
+}
+
+.email-panneau-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--cannelle);
+}
+
+.email-panneau-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--cannelle);
+  border: 1px solid var(--gris-clair);
+}
+
+.btn-outline:hover {
+  background: var(--gris-clair);
+}
+
+.email-panneau-hint {
+  margin: 0;
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  color: #8a7663;
+  background: #fdf6ec;
+  border-bottom: 1px solid var(--gris-clair);
+}
+
+.email-preview-frame {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: none;
+  background: #fdf6ec;
+}
+
+.email-html-source {
+  display: block;
+  width: 100%;
+  height: 140px;
+  margin: 0;
+  padding: 12px 16px;
+  border: none;
+  border-top: 1px solid var(--gris-clair);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #5a4a3a;
+  background: #faf8f5;
+  resize: vertical;
 }

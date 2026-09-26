@@ -59,10 +59,13 @@ class App {
   async _afficherStock() {
     this.content.innerHTML = `<div id="stock-table-container"></div>`;
     const container = document.getElementById("stock-table-container");
-    const table = new StockTable(container);
 
     try {
-      const stock = await this.apiClient.listerStock();
+      const [stock, seuil] = await Promise.all([
+        this.apiClient.listerStock(),
+        this.apiClient.getSeuilStockBas().catch(() => 5),
+      ]);
+      const table = new StockTable(container, this.apiClient, seuil);
       table.render(stock);
     } catch (err) {
       container.innerHTML = `<p class="error">${err.message}</p>`;
