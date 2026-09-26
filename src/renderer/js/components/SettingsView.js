@@ -3,7 +3,9 @@
  * Vue "Parametres" composee de :
  *  - Changer le mot de passe (ancien + nouveau + confirmation)
  *  - Seuil d'alerte stock bas
+ *  - Langue de l'interface (allemand / français)
  *  - Version de l'application (affichage uniquement)
+ * Textes internationalises (DE / FR).
  */
 class SettingsView {
   constructor(container, apiClient) {
@@ -16,7 +18,7 @@ class SettingsView {
     try {
       version = await this.apiClient.obtenirVersion();
     } catch (err) {
-      version = "inconnue";
+      version = "—";
     }
 
     let seuil = 5;
@@ -26,42 +28,62 @@ class SettingsView {
       seuil = 5;
     }
 
+    const langActuelle = I18n.getLang();
+
     this.container.innerHTML = `
       <div class="parametres-grille">
         <section class="form-card">
-          <h3>🔒 Changer le mot de passe</h3>
+          <h3>${I18n.t("settings.languageTitle")}</h3>
+          <p class="param-desc">
+            ${I18n.t("settings.languageDesc")}
+          </p>
+          <form id="form-langue">
+            <div class="field">
+              <label for="langue-select">${I18n.t("settings.languageLabel")}</label>
+              <select id="langue-select" name="langue">
+                <option value="de" ${langActuelle === "de" ? "selected" : ""}>${I18n.t("settings.lang.de")}</option>
+                <option value="fr" ${langActuelle === "fr" ? "selected" : ""}>${I18n.t("settings.lang.fr")}</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">${I18n.t("settings.saveLanguage")}</button>
+            <p class="form-message" id="msg-langue"></p>
+          </form>
+        </section>
+
+        <section class="form-card">
+          <h3>${I18n.t("settings.changePassword")}</h3>
           <form id="form-changer-mdp">
-            ${this._champMotDePasse("ancienMotDePasse", "Mot de passe actuel")}
-            ${this._champMotDePasse("nouveauMotDePasse", "Nouveau mot de passe")}
-            ${this._champMotDePasse("confirmation", "Confirmer le nouveau mot de passe")}
-            <button type="submit" class="btn btn-primary">Mettre a jour le mot de passe</button>
+            ${this._champMotDePasse("ancienMotDePasse", I18n.t("settings.currentPassword"))}
+            ${this._champMotDePasse("nouveauMotDePasse", I18n.t("settings.newPassword"))}
+            ${this._champMotDePasse("confirmation", I18n.t("settings.confirmNewPassword"))}
+            <button type="submit" class="btn btn-primary">${I18n.t("settings.updatePassword")}</button>
             <p class="form-message" id="msg-mdp"></p>
           </form>
         </section>
 
         <section class="form-card">
-          <h3>⚠️ Seuil d'alerte stock bas</h3>
+          <h3>${I18n.t("settings.thresholdTitle")}</h3>
           <p class="param-desc">
-            Les epices dont le stock est strictement inferieur a ce seuil
-            declenchent une alerte et peuvent generer un e-mail HTML.
+            ${I18n.t("settings.thresholdDesc")}
           </p>
           <form id="form-seuil">
             <div class="field">
-              <label for="seuil-input">Seuil (quantite)</label>
+              <label for="seuil-input">${I18n.t("settings.thresholdLabel")}</label>
               <input type="number" id="seuil-input" name="seuil" min="0" step="1" value="${seuil}" required />
             </div>
-            <button type="submit" class="btn btn-primary">Enregistrer le seuil</button>
+            <button type="submit" class="btn btn-primary">${I18n.t("settings.saveThreshold")}</button>
             <p class="form-message" id="msg-seuil"></p>
           </form>
         </section>
 
         <section class="form-card">
-          <h3>ℹ️ Version de l'application</h3>
-          <p class="version-actuelle">Version installee : <strong>${version}</strong></p>
+          <h3>${I18n.t("settings.versionTitle")}</h3>
+          <p class="version-actuelle">${I18n.t("settings.versionInstalled")} <strong>${version}</strong></p>
         </section>
       </div>
     `;
 
+    this._attacherFormLangue();
     this._attacherFormMotDePasse();
     this._attacherFormSeuil();
   }
@@ -75,7 +97,7 @@ class SettingsView {
           <button
             type="button"
             class="toggle-mdp"
-            aria-label="Afficher le mot de passe"
+            aria-label="${I18n.t("auth.showPassword")}"
             aria-pressed="false"
           >👁</button>
         </div>
@@ -95,9 +117,32 @@ class SettingsView {
         bouton.setAttribute("aria-pressed", String(!visible));
         bouton.setAttribute(
           "aria-label",
-          visible ? "Afficher le mot de passe" : "Masquer le mot de passe"
+          visible ? I18n.t("auth.showPassword") : I18n.t("auth.hidePassword")
         );
       });
+    });
+  }
+
+  // ---------- Bloc : langue ----------
+
+  _attacherFormLangue() {
+    const form = this.container.querySelector("#form-langue");
+    const msg = this.container.querySelector("#msg-langue");
+    const select = this.container.querySelector("#langue-select");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      msg.textContent = "";
+      msg.className = "form-message";
+
+      const nouvelleLangue = select.value;
+      I18n.setLang(nouvelleLangue);
+      // I18n.onChange declenche le re-render de la page (via App),
+      // donc le message de succes sera affiche apres le re-render
+      // uniquement si on ne change pas de page. On laisse le feedback
+      // simple ici ; le re-render mettra tout a jour.
+      msg.textContent = I18n.t("settings.languageSuccess");
+      msg.classList.add("success");
     });
   }
 
@@ -120,14 +165,14 @@ class SettingsView {
       const confirmation = data.get("confirmation");
 
       if (nouveauMotDePasse !== confirmation) {
-        msg.textContent = "Les nouveaux mots de passe ne correspondent pas.";
+        msg.textContent = I18n.t("settings.passwordMismatch");
         msg.classList.add("error");
         return;
       }
 
       try {
         await this.apiClient.authChanger(ancienMotDePasse, nouveauMotDePasse);
-        msg.textContent = "Mot de passe mis a jour avec succes.";
+        msg.textContent = I18n.t("settings.passwordSuccess");
         msg.classList.add("success");
         form.reset();
       } catch (err) {
@@ -151,7 +196,7 @@ class SettingsView {
       const seuil = Number(form.querySelector("#seuil-input").value);
       try {
         await this.apiClient.setSeuilStockBas(seuil);
-        msg.textContent = "Seuil enregistre.";
+        msg.textContent = I18n.t("settings.thresholdSuccess");
         msg.classList.add("success");
       } catch (err) {
         msg.textContent = err.message;
@@ -159,5 +204,4 @@ class SettingsView {
       }
     });
   }
-
 }

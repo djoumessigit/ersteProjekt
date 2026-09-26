@@ -2,31 +2,34 @@
  * Classe RapportView (element graphique)
  * Affiche la liste chronologique des mouvements, avec un filtre par type.
  * Permet de generer un e-mail HTML du rapport.
+ * Textes internationalises (DE / FR).
  */
 class RapportView {
   constructor(container, apiClient) {
     this.container = container;
     this.apiClient = apiClient;
     this._dernierMouvements = [];
-    this._dernierFiltreLabel = "Tous les mouvements";
+    this._dernierFiltreLabel = "";
   }
 
   async render() {
     this.container.innerHTML = `
       <div class="rapport-filtres">
-        <label>Filtrer : </label>
+        <label>${I18n.t("rapport.filter")} </label>
         <select id="filtre-type">
-          <option value="">Tous les mouvements</option>
-          <option value="ENTREE">Entrees uniquement</option>
-          <option value="SORTIE">Sorties uniquement</option>
+          <option value="">${I18n.t("rapport.all")}</option>
+          <option value="ENTREE">${I18n.t("rapport.entrees")}</option>
+          <option value="SORTIE">${I18n.t("rapport.sorties")}</option>
         </select>
         <button type="button" class="btn btn-primary" id="btn-email-rapport">
-          Generer e-mail HTML
+          ${I18n.t("rapport.generateEmail")}
         </button>
       </div>
       <div id="rapport-liste"></div>
       <div id="email-rapport-panneau" class="email-panneau-wrapper"></div>
     `;
+
+    this._dernierFiltreLabel = I18n.t("rapport.all");
 
     const select = this.container.querySelector("#filtre-type");
     select.addEventListener("change", () => this._charger(select.value));
@@ -34,7 +37,7 @@ class RapportView {
     this.container.querySelector("#btn-email-rapport").addEventListener("click", () => {
       try {
         if (typeof EmailHtml === "undefined") {
-          alert("EmailHtml n'est pas charge. Verifie que le fichier js/utils/EmailHtml.js existe et est inclus dans index.html.");
+          alert(I18n.t("email.errorNoModule"));
           return;
         }
         const html = EmailHtml.rapportMouvements(
@@ -45,7 +48,7 @@ class RapportView {
         EmailHtml.afficherPanneau(panneau, html, "rapport-mouvements");
       } catch (err) {
         console.error(err);
-        alert("Erreur lors de la generation de l'e-mail : " + err.message);
+        alert(I18n.t("email.errorGenerate") + err.message);
       }
     });
 
@@ -58,14 +61,14 @@ class RapportView {
     this._dernierMouvements = mouvements;
 
     const labels = {
-      "": "Tous les mouvements",
-      ENTREE: "Entrees uniquement",
-      SORTIE: "Sorties uniquement",
+      "": I18n.t("rapport.all"),
+      ENTREE: I18n.t("rapport.entrees"),
+      SORTIE: I18n.t("rapport.sorties"),
     };
-    this._dernierFiltreLabel = labels[type] || "Tous les mouvements";
+    this._dernierFiltreLabel = labels[type] || I18n.t("rapport.all");
 
     if (mouvements.length === 0) {
-      liste.innerHTML = `<p class="empty">Aucun mouvement enregistre.</p>`;
+      liste.innerHTML = `<p class="empty">${I18n.t("rapport.empty")}</p>`;
       return;
     }
 

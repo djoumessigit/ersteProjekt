@@ -4,6 +4,7 @@
  *  - si aucun mot de passe n'est encore defini -> formulaire de creation
  *  - sinon -> formulaire de connexion
  * N'appelle onSuccess que lorsque l'acces est autorise.
+ * Textes internationalises (DE / FR).
  */
 class AuthGate {
   constructor(apiClient, authScreen, appShell, onSuccess) {
@@ -33,14 +34,14 @@ class AuthGate {
     this.authScreen.innerHTML = `
       <div class="auth-card">
         <img class="auth-logo" src="assets/logo.svg" alt="Logo MA'A-Bri" />
-        <h2>Bienvenue sur MA'A-Bri</h2>
+        <h2>${I18n.t("auth.welcome")}</h2>
         <p class="auth-sous-titre">
-          Premier lancement : cree un mot de passe pour proteger l'acces a l'application.
+          ${I18n.t("auth.firstLaunch")}
         </p>
         <form id="form-auth-creation">
-          ${this._champMotDePasse("motDePasse", "Nouveau mot de passe", { autofocus: true })}
-          ${this._champMotDePasse("confirmation", "Confirmer le mot de passe")}
-          <button type="submit" class="btn btn-primary">Definir le mot de passe</button>
+          ${this._champMotDePasse("motDePasse", I18n.t("auth.newPassword"), { autofocus: true })}
+          ${this._champMotDePasse("confirmation", I18n.t("auth.confirmPassword"))}
+          <button type="submit" class="btn btn-primary">${I18n.t("auth.setPassword")}</button>
           <p class="form-message" id="msg-auth"></p>
         </form>
       </div>
@@ -60,7 +61,7 @@ class AuthGate {
       const confirmation = data.get("confirmation");
 
       if (motDePasse !== confirmation) {
-        msg.textContent = "Les mots de passe ne correspondent pas.";
+        msg.textContent = I18n.t("auth.passwordMismatch");
         msg.classList.add("error");
         return;
       }
@@ -81,11 +82,11 @@ class AuthGate {
     this.authScreen.innerHTML = `
       <div class="auth-card">
         <img class="auth-logo" src="assets/logo.svg" alt="Logo MA'A-Bri" />
-        <h2>MA'A-Bri</h2>
-        <p class="auth-sous-titre">Entre le mot de passe pour acceder a l'application.</p>
+        <h2>${I18n.t("auth.loginTitle")}</h2>
+        <p class="auth-sous-titre">${I18n.t("auth.loginSubtitle")}</p>
         <form id="form-auth-connexion">
-          ${this._champMotDePasse("motDePasse", "Mot de passe", { autofocus: true })}
-          <button type="submit" class="btn btn-primary">Se connecter</button>
+          ${this._champMotDePasse("motDePasse", I18n.t("auth.password"), { autofocus: true })}
+          <button type="submit" class="btn btn-primary">${I18n.t("auth.login")}</button>
           <p class="form-message" id="msg-auth"></p>
         </form>
       </div>
@@ -106,7 +107,7 @@ class AuthGate {
       try {
         const valide = await this.apiClient.authVerifier(motDePasse);
         if (!valide) {
-          msg.textContent = "Mot de passe incorrect.";
+          msg.textContent = I18n.t("auth.wrongPassword");
           msg.classList.add("error");
           form.reset();
           form.querySelector("input[name='motDePasse']").focus();
@@ -141,7 +142,7 @@ class AuthGate {
           <button
             type="button"
             class="toggle-mdp"
-            aria-label="Afficher le mot de passe"
+            aria-label="${I18n.t("auth.showPassword")}"
             aria-pressed="false"
           >👁</button>
         </div>
@@ -161,7 +162,7 @@ class AuthGate {
         bouton.setAttribute("aria-pressed", String(!visible));
         bouton.setAttribute(
           "aria-label",
-          visible ? "Afficher le mot de passe" : "Masquer le mot de passe"
+          visible ? I18n.t("auth.showPassword") : I18n.t("auth.hidePassword")
         );
       });
     });

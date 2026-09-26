@@ -2,6 +2,7 @@
  * Classe FormAjout (element graphique)
  * Formulaire "Entree de stock" : ajout d'un paquet pour une epice existante,
  * avec possibilite de creer une nouvelle epice a la volee.
+ * Textes internationalises (DE / FR).
  */
 class FormAjout {
   constructor(container, apiClient, onSuccess) {
@@ -20,37 +21,37 @@ class FormAjout {
 
     this.container.innerHTML = `
       <form id="form-entree" class="form-card">
-        <h3>Entree de stock</h3>
+        <h3>${I18n.t("entree.title")}</h3>
 
         <div class="field">
-          <label>Epice existante</label>
+          <label>${I18n.t("entree.existing")}</label>
           <select name="epiceId">
-            <option value="">-- choisir --</option>
+            <option value="">${I18n.t("entree.choose")}</option>
             ${options}
           </select>
         </div>
 
-        <p class="separator">ou creer une nouvelle epice :</p>
+        <p class="separator">${I18n.t("entree.orNew")}</p>
 
         <div class="field">
-          <label>Nom de la nouvelle epice</label>
-          <input type="text" name="nouveauNom" placeholder="ex: Curcuma" />
+          <label>${I18n.t("entree.newName")}</label>
+          <input type="text" name="nouveauNom" placeholder="${I18n.t("epice.namePlaceholder")}" />
         </div>
         <div class="field">
-          <label>Unite</label>
-          <input type="text" name="nouvelleUnite" placeholder="ex: g, kg, paquet" />
+          <label>${I18n.t("entree.unit")}</label>
+          <input type="text" name="nouvelleUnite" placeholder="${I18n.t("epice.unitPlaceholder")}" />
         </div>
 
         <div class="field">
-          <label>Quantite</label>
+          <label>${I18n.t("entree.quantity")}</label>
           <input type="number" name="quantite" min="0" step="any" required />
         </div>
         <div class="field">
-          <label>Date</label>
+          <label>${I18n.t("entree.date")}</label>
           <input type="date" name="date" required />
         </div>
 
-        <button type="submit" class="btn btn-primary">Ajouter le paquet</button>
+        <button type="submit" class="btn btn-primary">${I18n.t("entree.submit")}</button>
         <p class="form-message" id="msg-entree"></p>
       </form>
     `;
@@ -80,12 +81,12 @@ class FormAjout {
           epiceId = epiceCreee.id;
         }
         if (!epiceId) {
-          throw new Error("Choisis une epice existante ou renseigne une nouvelle epice.");
+          throw new Error(I18n.t("entree.needEpice"));
         }
 
         await this.apiClient.ajouterEntree(Number(epiceId), quantite, date);
 
-        msg.textContent = "Paquet ajoute avec succes.";
+        msg.textContent = I18n.t("entree.success");
         msg.classList.add("success");
         form.reset();
 

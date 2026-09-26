@@ -2,6 +2,7 @@
  * Utilitaire de generation d'e-mails HTML (email-safe).
  * Utilise des tables et des styles inline pour une compatibilite
  * maximale avec Outlook, Gmail, Apple Mail, etc.
+ * Textes internationalises via I18n (DE / FR).
  */
 class EmailHtml {
   /**
@@ -11,7 +12,7 @@ class EmailHtml {
    * @returns {string} HTML complet pret a copier / exporter
    */
   static alerteStockBas(epicesSousSeuil, seuil) {
-    const date = new Date().toLocaleDateString("fr-FR", {
+    const date = new Date().toLocaleDateString(I18n.locale(), {
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -32,33 +33,32 @@ class EmailHtml {
       .join("");
 
     return this._enveloppe(
-      "Alerte stock bas — MA'A-Bri",
+      I18n.t("email.alert.subject"),
       `
       <h1 style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:20px;color:#6b3f2a;">
-        Alerte stock bas
+        ${I18n.t("email.alert.title")}
       </h1>
       <p style="margin:0 0 18px;font-family:Arial,sans-serif;font-size:14px;color:#5a4a3a;line-height:1.5;">
-        Le ${date}, les epices suivantes sont sous le seuil d'alerte
-        (<strong>${seuil}</strong>) :
+        ${I18n.t("email.alert.intro", { date, seuil })}
       </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
              style="border-collapse:collapse;background:#ffffff;border:1px solid #e9ddcb;">
         <thead>
           <tr>
             <th style="padding:10px 14px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;text-align:left;">
-              Epice
+              ${I18n.t("email.alert.colEpice")}
             </th>
             <th style="padding:10px 14px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;text-align:right;">
-              Stock actuel
+              ${I18n.t("email.alert.colStock")}
             </th>
           </tr>
         </thead>
         <tbody>
-          ${lignes || `<tr><td colspan="2" style="padding:14px;font-family:Arial,sans-serif;font-size:14px;color:#8a7663;">Aucune epice sous le seuil.</td></tr>`}
+          ${lignes || `<tr><td colspan="2" style="padding:14px;font-family:Arial,sans-serif;font-size:14px;color:#8a7663;">${I18n.t("email.alert.none")}</td></tr>`}
         </tbody>
       </table>
       <p style="margin:20px 0 0;font-family:Arial,sans-serif;font-size:12px;color:#8a7663;">
-        Message genere automatiquement par MA'A-Bri — Gestion de stock.
+        ${I18n.t("email.footer")}
       </p>`
     );
   }
@@ -70,7 +70,7 @@ class EmailHtml {
    * @returns {string} HTML complet
    */
   static rapportMouvements(mouvements, filtreLabel) {
-    const date = new Date().toLocaleDateString("fr-FR", {
+    const date = new Date().toLocaleDateString(I18n.locale(), {
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -96,40 +96,41 @@ class EmailHtml {
       .join("");
 
     return this._enveloppe(
-      "Rapport des mouvements — MA'A-Bri",
+      I18n.t("email.rapport.subject"),
       `
       <h1 style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:20px;color:#6b3f2a;">
-        Rapport des mouvements
+        ${I18n.t("email.rapport.title")}
       </h1>
       <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:14px;color:#5a4a3a;">
-        Genere le ${date}
+        ${I18n.t("email.rapport.generated", { date })}
       </p>
       <p style="margin:0 0 18px;font-family:Arial,sans-serif;font-size:13px;color:#8a7663;">
-        Filtre : ${this._esc(filtreLabel)}
+        ${I18n.t("email.rapport.filter", { filtre: this._esc(filtreLabel) })}
       </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
              style="border-collapse:collapse;background:#ffffff;border:1px solid #e9ddcb;">
         <thead>
           <tr>
-            <th style="padding:10px 12px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;text-align:left;">Date</th>
-            <th style="padding:10px 12px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;text-align:left;">Epice</th>
-            <th style="padding:10px 12px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;text-align:right;">Quantite</th>
+            <th style="padding:10px 12px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;text-align:left;">${I18n.t("email.rapport.colDate")}</th>
+            <th style="padding:10px 12px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;text-align:left;">${I18n.t("email.rapport.colEpice")}</th>
+            <th style="padding:10px 12px;background:#e08a1e;color:#ffffff;font-family:Arial,sans-serif;font-size:12px;text-align:right;">${I18n.t("email.rapport.colQty")}</th>
           </tr>
         </thead>
         <tbody>
-          ${lignes || `<tr><td colspan="3" style="padding:14px;font-family:Arial,sans-serif;font-size:14px;color:#8a7663;">Aucun mouvement.</td></tr>`}
+          ${lignes || `<tr><td colspan="3" style="padding:14px;font-family:Arial,sans-serif;font-size:14px;color:#8a7663;">${I18n.t("email.rapport.none")}</td></tr>`}
         </tbody>
       </table>
       <p style="margin:20px 0 0;font-family:Arial,sans-serif;font-size:12px;color:#8a7663;">
-        Message genere automatiquement par MA'A-Bri — Gestion de stock.
+        ${I18n.t("email.footer")}
       </p>`
     );
   }
 
   /** Enveloppe HTML email-safe (doctype + table centree). */
   static _enveloppe(sujet, corpsHtml) {
+    const lang = I18n.getLang() === "de" ? "de" : "fr";
     return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -147,7 +148,7 @@ class EmailHtml {
                 MA'A-Bri
               </span>
               <span style="font-family:Arial,sans-serif;font-size:12px;color:#f1e4d0;display:block;margin-top:2px;">
-                Gestion de stock
+                ${I18n.t("email.subtitle")}
               </span>
             </td>
           </tr>
@@ -182,7 +183,7 @@ class EmailHtml {
   static afficherPanneau(container, html, nomFichier) {
     if (!container) {
       console.error("EmailHtml.afficherPanneau: container introuvable");
-      alert("Erreur : zone d'affichage de l'e-mail introuvable.");
+      alert(I18n.t("email.errorNoContainer"));
       return;
     }
 
@@ -194,22 +195,22 @@ class EmailHtml {
     const header = document.createElement("div");
     header.className = "email-panneau-header";
     header.innerHTML = `
-      <h3>E-mail HTML genere</h3>
+      <h3>${I18n.t("email.generated")}</h3>
       <div class="email-panneau-actions">
-        <button type="button" class="btn btn-primary" id="btn-copier-html">Copier le HTML</button>
-        <button type="button" class="btn btn-secondary" id="btn-telecharger-html">Telecharger .html</button>
-        <button type="button" class="btn btn-outline" id="btn-fermer-email">Fermer</button>
+        <button type="button" class="btn btn-primary" id="btn-copier-html">${I18n.t("email.copy")}</button>
+        <button type="button" class="btn btn-secondary" id="btn-telecharger-html">${I18n.t("email.download")}</button>
+        <button type="button" class="btn btn-outline" id="btn-fermer-email">${I18n.t("email.close")}</button>
       </div>
     `;
 
     const hint = document.createElement("p");
     hint.className = "email-panneau-hint";
-    hint.textContent = "Compatible Outlook, Gmail, Apple Mail. Styles inline + tables.";
+    hint.textContent = I18n.t("email.hint");
 
     const frame = document.createElement("iframe");
     frame.id = "email-preview-frame";
     frame.className = "email-preview-frame";
-    frame.title = "Apercu e-mail";
+    frame.title = I18n.t("email.preview");
     frame.setAttribute("sandbox", "allow-same-origin");
 
     const source = document.createElement("textarea");
@@ -253,11 +254,11 @@ class EmailHtml {
         await navigator.clipboard.writeText(html);
         const btn = header.querySelector("#btn-copier-html");
         const old = btn.textContent;
-        btn.textContent = "Copie !";
+        btn.textContent = I18n.t("email.copied");
         setTimeout(() => (btn.textContent = old), 1500);
       } catch (e) {
         source.select();
-        alert("Selectionne le HTML ci-dessous et copie-le (Ctrl+C).");
+        alert(I18n.t("email.copyFallback"));
       }
     });
 

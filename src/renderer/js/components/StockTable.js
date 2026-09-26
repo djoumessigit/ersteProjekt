@@ -3,6 +3,7 @@
  * Affiche le tableau des epices avec leur stock restant.
  * Met en evidence les epices sous le seuil d'alerte et permet
  * de generer un e-mail HTML d'alerte stock bas.
+ * Textes internationalises (DE / FR).
  */
 class StockTable {
   /**
@@ -18,7 +19,7 @@ class StockTable {
 
   render(stockItems) {
     if (!stockItems || stockItems.length === 0) {
-      this.container.innerHTML = `<p class="empty">Aucune epice enregistree pour le moment.</p>`;
+      this.container.innerHTML = `<p class="empty">${I18n.t("stock.empty")}</p>`;
       return;
     }
 
@@ -31,7 +32,7 @@ class StockTable {
         return `
         <tr class="${classe}">
           <td>${item.nom}</td>
-          <td>${item.stock}${alerte ? ' <span class="badge-alerte">sous seuil</span>' : ""}</td>
+          <td>${item.stock}${alerte ? ` <span class="badge-alerte">${I18n.t("stock.underThreshold")}</span>` : ""}</td>
           <td>${item.unite}</td>
         </tr>`;
       })
@@ -42,15 +43,15 @@ class StockTable {
         ? `
       <div class="stock-alerte-barre">
         <span>
-          <strong>${sousSeuil.length}</strong> epice(s) sous le seuil d'alerte (${this.seuil}).
+          ${I18n.t("stock.alertCount", { count: sousSeuil.length, seuil: this.seuil })}
         </span>
         <button type="button" class="btn btn-primary" id="btn-email-alerte">
-          Generer e-mail d'alerte
+          ${I18n.t("stock.generateEmail")}
         </button>
       </div>`
         : `
       <div class="stock-alerte-barre stock-alerte-ok">
-        <span>Aucune epice sous le seuil d'alerte (${this.seuil}).</span>
+        <span>${I18n.t("stock.noAlert", { seuil: this.seuil })}</span>
       </div>`;
 
     this.container.innerHTML = `
@@ -58,9 +59,9 @@ class StockTable {
       <table class="stock-table">
         <thead>
           <tr>
-            <th>Epice</th>
-            <th>Stock restant</th>
-            <th>Unite</th>
+            <th>${I18n.t("stock.col.epice")}</th>
+            <th>${I18n.t("stock.col.stock")}</th>
+            <th>${I18n.t("stock.col.unite")}</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -73,7 +74,7 @@ class StockTable {
       btn.addEventListener("click", () => {
         try {
           if (typeof EmailHtml === "undefined") {
-            alert("EmailHtml n'est pas charge. Verifie que le fichier js/utils/EmailHtml.js existe et est inclus dans index.html.");
+            alert(I18n.t("email.errorNoModule"));
             return;
           }
           const html = EmailHtml.alerteStockBas(sousSeuil, this.seuil);
@@ -81,7 +82,7 @@ class StockTable {
           EmailHtml.afficherPanneau(panneau, html, "alerte-stock-bas");
         } catch (err) {
           console.error(err);
-          alert("Erreur lors de la generation de l'e-mail : " + err.message);
+          alert(I18n.t("email.errorGenerate") + err.message);
         }
       });
     }

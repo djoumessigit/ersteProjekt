@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src 'self' blob: data:; child-src 'self' blob: data:;" />
@@ -17,28 +17,31 @@
         <img class="sidebar-logo" src="assets/logo.svg" alt="Logo MA'A-Bri" />
         <div class="sidebar-wordmark">
           <span class="sidebar-title">MA'A-Bri</span>
-          <span class="sidebar-subtitle">Gestion de stock</span>
+          <span class="sidebar-subtitle" data-i18n="sidebar.subtitle">Bestandsverwaltung</span>
         </div>
       </div>
       <nav>
-        <button class="nav-btn active" data-page="stock">📦 Stock</button>
-        <button class="nav-btn" data-page="epice">🌿 Epice</button>
-        <button class="nav-btn" data-page="entree">➕ Entree</button>
-        <button class="nav-btn" data-page="sortie">➖ Sortie</button>
-        <button class="nav-btn" data-page="rapport">📊 Rapport</button>
-        <button class="nav-btn" data-page="parametres">⚙️ Parametres</button>
+        <button class="nav-btn active" data-page="stock" data-i18n="nav.stock">📦 Bestand</button>
+        <button class="nav-btn" data-page="epice" data-i18n="nav.epice">🌿 Gewürz</button>
+        <button class="nav-btn" data-page="entree" data-i18n="nav.entree">➕ Eingang</button>
+        <button class="nav-btn" data-page="sortie" data-i18n="nav.sortie">➖ Ausgang</button>
+        <button class="nav-btn" data-page="rapport" data-i18n="nav.rapport">📊 Bericht</button>
+        <button class="nav-btn" data-page="parametres" data-i18n="nav.parametres">⚙️ Einstellungen</button>
       </nav>
     </aside>
 
     <main class="main-area">
       <header class="main-header">
         <div class="main-header-inner">
-          <h1 id="page-title">Vue Stock</h1>
+          <h1 id="page-title">Bestandsübersicht</h1>
         </div>
       </header>
       <section id="content" class="content"></section>
     </main>
   </div>
+
+  <!-- i18n (doit être chargé avant les composants) -->
+  <script src="js/i18n/i18n.js"></script>
 
   <!-- Services renderer (gestion des requetes vers le main-process) -->
   <script src="js/services/ApiClient.js"></script>

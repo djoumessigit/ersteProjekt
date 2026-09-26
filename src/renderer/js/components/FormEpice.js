@@ -2,6 +2,7 @@
  * Classe FormEpice (element graphique)
  * Vue dediee a la creation d'une nouvelle epice (independamment des
  * formulaires Entree / Sortie), avec rappel des epices deja existantes.
+ * Textes internationalises (DE / FR).
  */
 class FormEpice {
   constructor(container, apiClient, onSuccess) {
@@ -16,23 +17,23 @@ class FormEpice {
 
     this.container.innerHTML = `
       <form id="form-epice" class="form-card">
-        <h3>Nouvelle epice</h3>
+        <h3>${I18n.t("epice.title")}</h3>
 
         <div class="field">
-          <label>Nom de l'epice</label>
-          <input type="text" name="nom" placeholder="ex: Curcuma" required />
+          <label>${I18n.t("epice.name")}</label>
+          <input type="text" name="nom" placeholder="${I18n.t("epice.namePlaceholder")}" required />
         </div>
         <div class="field">
-          <label>Unite de gestion</label>
-          <input type="text" name="unite" placeholder="ex: g, kg, paquet" required />
+          <label>${I18n.t("epice.unit")}</label>
+          <input type="text" name="unite" placeholder="${I18n.t("epice.unitPlaceholder")}" required />
         </div>
 
-        <button type="submit" class="btn btn-primary">Creer l'epice</button>
+        <button type="submit" class="btn btn-primary">${I18n.t("epice.create")}</button>
         <p class="form-message" id="msg-epice"></p>
       </form>
 
       <div class="epices-existantes">
-        <h3>Epices deja enregistrees (${this.epices.length})</h3>
+        <h3>${I18n.t("epice.existing", { count: this.epices.length })}</h3>
         ${this._listeHtml()}
       </div>
     `;
@@ -42,7 +43,7 @@ class FormEpice {
 
   _listeHtml() {
     if (!this.epices.length) {
-      return `<p class="empty">Aucune epice enregistree pour le moment.</p>`;
+      return `<p class="empty">${I18n.t("epice.none")}</p>`;
     }
 
     const items = this.epices
@@ -70,7 +71,7 @@ class FormEpice {
       try {
         await this.apiClient.ajouterEpice(nom, unite);
 
-        msg.textContent = "Epice creee avec succes.";
+        msg.textContent = I18n.t("epice.success");
         msg.classList.add("success");
         form.reset();
 

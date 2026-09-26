@@ -1,6 +1,7 @@
 /**
  * Classe FormSortie (element graphique)
  * Formulaire "Sortie de stock" : retire un paquet pour une epice existante.
+ * Textes internationalises (DE / FR).
  */
 class FormSortie {
   constructor(container, apiClient, onSuccess) {
@@ -19,26 +20,26 @@ class FormSortie {
 
     this.container.innerHTML = `
       <form id="form-sortie" class="form-card">
-        <h3>Sortie de stock</h3>
+        <h3>${I18n.t("sortie.title")}</h3>
 
         <div class="field">
-          <label>Epice</label>
+          <label>${I18n.t("sortie.epice")}</label>
           <select name="epiceId" required>
-            <option value="">-- choisir --</option>
+            <option value="">${I18n.t("sortie.choose")}</option>
             ${options}
           </select>
         </div>
 
         <div class="field">
-          <label>Quantite</label>
+          <label>${I18n.t("sortie.quantity")}</label>
           <input type="number" name="quantite" min="0" step="any" required />
         </div>
         <div class="field">
-          <label>Date</label>
+          <label>${I18n.t("sortie.date")}</label>
           <input type="date" name="date" required />
         </div>
 
-        <button type="submit" class="btn btn-secondary">Retirer le paquet</button>
+        <button type="submit" class="btn btn-secondary">${I18n.t("sortie.submit")}</button>
         <p class="form-message" id="msg-sortie"></p>
       </form>
     `;
@@ -61,10 +62,10 @@ class FormSortie {
       const date = data.get("date");
 
       try {
-        if (!epiceId) throw new Error("Choisis une epice.");
+        if (!epiceId) throw new Error(I18n.t("sortie.needEpice"));
         await this.apiClient.ajouterSortie(epiceId, quantite, date);
 
-        msg.textContent = "Paquet retire avec succes.";
+        msg.textContent = I18n.t("sortie.success");
         msg.classList.add("success");
         form.reset();
 
